@@ -5,8 +5,6 @@ namespace bcgovneo4j
 {
     class Program
     {
-        // neo4j password - cement-gregory-fiesta-invite-telex-6617
-
         static void Main(string[] args)
         {
             Console.WriteLine("Started");
