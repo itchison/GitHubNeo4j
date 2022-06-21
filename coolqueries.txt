@@ -1,0 +1,26 @@
+MATCH (c:Person)-[r:CONTRIBUTOR_OF]->(repos) 
+where c.name='Jsyro'
+RETURN *
+
+MATCH (c:Person)-[r:CONTRIBUTOR_OF]->(repos)<-[m:CONTRIBUTOR_OF]-(people) 
+where c.name='ActionAnalytics' and people.name <> 'repo-mountie[bot]' and people.name <> 'dependabot[bot]'
+RETURN *
+
+MATCH (c:Person)-[r:CONTRIBUTOR_OF]->(repos)<-[m:CONTRIBUTOR_OF]-(people) 
+where c.name='Jsyro' and people.name <> 'repo-mountie[bot]' and people.name <> 'dependabot[bot]'
+RETURN count(c)
+
+MATCH (a:Person {name:"itchison"} ),
+  (e:Person {name:"jleach"}),
+  p = shortestPath((a)-[*]-(e))
+RETURN p
+
+MATCH (a:Person {name:"itchison"} ),
+  (e:Person {name:"jleach"}),
+  p = shortestPath((a)-[:CONTRIBUTOR_OF*]-(e))
+RETURN *
+
+MATCH (a:Person {name:"itchison"} ),
+  (e:Person {name:"matthieu-foucault"}),
+  p = shortestPath((a)-[:CONTRIBUTOR_OF*]-(e))
+RETURN *
