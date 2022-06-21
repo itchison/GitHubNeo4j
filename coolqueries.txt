@@ -3,11 +3,11 @@ where c.name='Jsyro'
 RETURN *
 
 MATCH (c:Person)-[r:CONTRIBUTOR_OF]->(repos)<-[m:CONTRIBUTOR_OF]-(people) 
-where c.name='ActionAnalytics' and people.name <> 'repo-mountie[bot]' and people.name <> 'dependabot[bot]'
+where c.name='ActionAnalytics' 
 RETURN *
 
 MATCH (c:Person)-[r:CONTRIBUTOR_OF]->(repos)<-[m:CONTRIBUTOR_OF]-(people) 
-where c.name='Jsyro' and people.name <> 'repo-mountie[bot]' and people.name <> 'dependabot[bot]'
+where c.name='Jsyro' 
 RETURN count(c)
 
 MATCH (a:Person {name:"itchison"} ),
