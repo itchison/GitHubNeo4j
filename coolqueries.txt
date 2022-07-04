@@ -24,3 +24,8 @@ MATCH (a:Person {name:"itchison"} ),
   (e:Person {name:"matthieu-foucault"}),
   p = shortestPath((a)-[:CONTRIBUTOR_OF*]-(e))
 RETURN *
+
+MATCH (a:Person {name:"itchison"} ),
+  (e:Person {name:"AubreyR"}),
+  p = shortestPath((a)-[:CONTRIBUTOR_OF*]-(e))
+RETURN *
