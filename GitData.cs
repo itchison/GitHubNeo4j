@@ -21,15 +21,17 @@ namespace bcgovneo4j
         }
 
         public async Task GetData()
-        {          
+        {
             var org = await github.Organization.Get("bcgov");
             var members = await github.Organization.Member.GetAll("bcgov");
             List<string> allusers = new List<string>();
+            List<string> alllanguages = new List<string>();
             var repos = await github.Repository.GetAllForOrg("bcgov");
             Console.WriteLine(members.Count() + " are a member of bcgov and has " + repos.Count() + " repos");
-            await Throttle();
+            await Throttle();            
             using (var session = _driver.AsyncSession())
             {
+                await WipeAllDate();
                 await session.WriteTransactionAsync(async tx =>
                 {
                     await tx.RunAsync($"CREATE (bcgov:Org {{name:'{org.Name}', url: '{org.Url}', id: '{org.Id}'}})");
@@ -85,6 +87,26 @@ namespace bcgovneo4j
                         }
 
                     }
+                    var repolangs = await github.Repository.GetAllLanguages(repo.Id);
+                    var x = repo.Language;
+                    foreach (var language in repolangs)
+                    {
+                        if (!alllanguages.Contains(language.Name))
+                        {
+                            Console.WriteLine("Found new language " + language.Name);
+                            await session.WriteTransactionAsync(async tx =>
+                            {
+                                await tx.RunAsync($"CREATE (lang:Language {{name:'{language.Name}', Id:'{language.Name}'}})");
+                                alllanguages.Add(language.Name);
+                            });                            
+                        }
+                        await session.WriteTransactionAsync(async tx =>
+                        {
+                            await tx.RunAsync($"MATCH (a:Repository), (b:Language) WHERE a.Id = '{repo.Id}' AND b.Id = '{language.Name}' CREATE (a)-[r:DEVELOPED_IN {{roles:['Programming Language']}}]->(b) RETURN type(r)");
+                        });
+                    }
+
+
                     reposcount++;
                 }
 
@@ -93,6 +115,17 @@ namespace bcgovneo4j
 
             }
 
+        }
+
+        async Task WipeAllDate()
+        {
+            using (var session = _driver.AsyncSession())
+            {
+                await session.WriteTransactionAsync(async tx =>
+                    {
+                        await tx.RunAsync($"MATCH (n) DETACH DELETE n");
+                    });
+            }
         }
 
         async Task GetRates()
