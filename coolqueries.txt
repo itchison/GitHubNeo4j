@@ -3,8 +3,13 @@ where c.name='Jsyro'
 RETURN *
 
 MATCH (c:Person)-[r:CONTRIBUTOR_OF]->(repos)<-[m:CONTRIBUTOR_OF]-(people) 
-where c.name='ActionAnalytics' 
+where c.name='adodge-bcg' 
 RETURN *
+
+MATCH (c:Person)-[r:CONTRIBUTOR_OF]->(repos)<-[m:CONTRIBUTOR_OF]-(people) 
+where c.name='BrendanBeachBC' 
+RETURN *
+
 
 MATCH (c:Person)-[r:CONTRIBUTOR_OF]->(repos)<-[m:CONTRIBUTOR_OF]-(people) 
 where c.name='Jsyro' 
@@ -33,3 +38,17 @@ RETURN *
 MATCH (c:Person)-[r:CONTRIBUTOR_OF]->(repos)--(s:Language)
 where c.name='james-hollinger'
 RETURN *
+
+MATCH (r:Repository)--(s:Topic)
+RETURN s.name, count(*) as count
+ORDER BY count DESC
+
+MATCH (t:Topic)--(c:Repository)--(p:Person)
+Where t.name = 'hlth'
+RETURN *
+
+MATCH (t:Topic)--(c:Repository)--(p:Person)
+Where t.name = 'hlth'
+RETURN p.name, count(c) as cnt
+ORDER BY cnt desc
+
