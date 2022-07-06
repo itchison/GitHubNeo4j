@@ -52,3 +52,10 @@ Where t.name = 'hlth'
 RETURN p.name, count(c) as cnt
 ORDER BY cnt desc
 
+MATCH (r:Repository)-[d:DEVELOPED_IN]-(l:Language) 
+Return l.name, sum(toInteger(d.Bytes[0]))/1024/1024 as GB 
+order by GB desc
+
+MATCH (r:Repository)-[d:DEVELOPED_IN]-(l:Language) 
+Return l.name, count(l) as cnt
+order by cnt desc
