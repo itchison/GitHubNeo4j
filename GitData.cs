@@ -26,6 +26,7 @@ namespace bcgovneo4j
             var members = await github.Organization.Member.GetAll("bcgov");
             List<string> allusers = new List<string>();
             List<string> alllanguages = new List<string>();
+            List<string> alltopics = new List<string>();
             var repos = await github.Repository.GetAllForOrg("bcgov");
             Console.WriteLine(members.Count() + " are a member of bcgov and has " + repos.Count() + " repos");
             await Throttle();            
@@ -88,7 +89,6 @@ namespace bcgovneo4j
 
                     }
                     var repolangs = await github.Repository.GetAllLanguages(repo.Id);
-                    var x = repo.Language;
                     foreach (var language in repolangs)
                     {
                         if (!alllanguages.Contains(language.Name))
@@ -102,10 +102,26 @@ namespace bcgovneo4j
                         }
                         await session.WriteTransactionAsync(async tx =>
                         {
-                            await tx.RunAsync($"MATCH (a:Repository), (b:Language) WHERE a.Id = '{repo.Id}' AND b.Id = '{language.Name}' CREATE (a)-[r:DEVELOPED_IN {{roles:['Programming Language']}}]->(b) RETURN type(r)");
+                            await tx.RunAsync($"MATCH (a:Repository), (b:Language) WHERE a.Id = '{repo.Id}' AND b.Id = '{language.Name}' CREATE (a)-[r:DEVELOPED_IN {{Bytes:['{language.NumberOfBytes}']}}]->(b) RETURN type(r)");
                         });
                     }
-
+                    var repotopics = await github.Repository.GetAllTopics(repo.Id);
+                    foreach (var topic in repotopics.Names)
+                    {
+                        if (!alltopics.Contains(topic))
+                        {
+                            Console.WriteLine("Found new topic " + topic);
+                            await session.WriteTransactionAsync(async tx =>
+                            {
+                                await tx.RunAsync($"CREATE (top:Topic {{name:'{topic}', Id:'{topic}'}})");
+                                alltopics.Add(topic);
+                            });                            
+                        }
+                        await session.WriteTransactionAsync(async tx =>
+                        {
+                            await tx.RunAsync($"MATCH (a:Repository), (b:Topic) WHERE a.Id = '{repo.Id}' AND b.Id = '{topic}' CREATE (a)-[r:HAS_TOPIC]->(b) RETURN type(r)");
+                        });
+                    }
 
                     reposcount++;
                 }

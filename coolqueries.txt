@@ -29,3 +29,7 @@ MATCH (a:Person {name:"itchison"} ),
   (e:Person {name:"AubreyR"}),
   p = shortestPath((a)-[:CONTRIBUTOR_OF*]-(e))
 RETURN *
+
+MATCH (c:Person)-[r:CONTRIBUTOR_OF]->(repos)--(s:Language)
+where c.name='james-hollinger'
+RETURN *
